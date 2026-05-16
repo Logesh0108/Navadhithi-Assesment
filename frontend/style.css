@@ -1,0 +1,41 @@
+body{
+    font-family: Arial;
+    background:#f4f4f4;
+}
+
+.container{
+    width:60%;
+    margin:auto;
+    margin-top:40px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+.chat-container{
+    height:400px;
+    overflow-y:auto;
+    border:1px solid #ddd;
+    padding:10px;
+    margin-top:20px;
+}
+
+.user{
+    text-align:right;
+    margin:10px;
+}
+
+.bot{
+    text-align:left;
+    margin:10px;
+}
+
+.question-box{
+    display:flex;
+    margin-top:20px;
+}
+
+.question-box input{
+    flex:1;
+    padding:10px;
+}

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF AI Assistant</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:#0d0d0d;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            overflow:hidden;
+            position:relative;
+        }
+
+        body::before{
+            content:'';
+            position:absolute;
+            width:500px;
+            height:500px;
+            background:#ffb300;
+            border-radius:50%;
+            filter:blur(180px);
+            top:-150px;
+            left:-150px;
+            opacity:0.3;
+        }
+
+        body::after{
+            content:'';
+            position:absolute;
+            width:400px;
+            height:400px;
+            background:#ff8f00;
+            border-radius:50%;
+            filter:blur(180px);
+            bottom:-150px;
+            right:-150px;
+            opacity:0.25;
+        }
+
+        .container{
+            width:90%;
+            max-width:550px;
+            background:rgba(20,20,20,0.9);
+            border:1px solid rgba(255,255,255,0.05);
+            border-radius:30px;
+            padding:40px;
+            backdrop-filter:blur(20px);
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.5),
+                0 0 40px rgba(255,179,0,0.08);
+            z-index:1;
+        }
+
+        .title{
+            text-align:center;
+            color:#fff;
+            font-size:34px;
+            font-weight:700;
+            margin-bottom:10px;
+        }
+
+        .subtitle{
+            text-align:center;
+            color:#bdbdbd;
+            font-size:14px;
+            margin-bottom:35px;
+        }
+
+        .upload-box{
+            border:2px dashed rgba(255,179,0,0.5);
+            border-radius:22px;
+            padding:35px;
+            text-align:center;
+            background:rgba(255,255,255,0.02);
+            transition:0.3s;
+        }
+
+        .upload-box:hover{
+            border-color:#ffb300;
+            background:rgba(255,179,0,0.05);
+        }
+
+        .upload-box h3{
+            color:#ffb300;
+            margin-bottom:20px;
+            font-size:20px;
+        }
+
+        /* Hide default file input */
+
+        input[type="file"]{
+            display:none;
+        }
+
+        .custom-file-upload{
+            display:inline-block;
+            padding:14px 28px;
+            background:#ffb300;
+            color:#111;
+            border-radius:14px;
+            cursor:pointer;
+            font-weight:600;
+            transition:0.3s;
+        }
+
+        .custom-file-upload:hover{
+            background:#ffc107;
+            transform:translateY(-2px);
+            box-shadow:0 5px 20px rgba(255,179,0,0.4);
+        }
+
+        #fileName{
+            margin-top:15px;
+            color:#cfcfcf;
+            font-size:14px;
+        }
+
+        .upload-btn{
+            width:100%;
+            margin-top:25px;
+            padding:16px;
+            border:none;
+            border-radius:16px;
+            background:#1c1c1c;
+            color:#fff;
+            font-size:16px;
+            font-weight:600;
+            cursor:pointer;
+            border:1px solid rgba(255,179,0,0.4);
+            transition:0.3s;
+        }
+
+        .upload-btn:hover{
+            background:#ffb300;
+            color:#111;
+            transform:translateY(-2px);
+            box-shadow:0 5px 20px rgba(255,179,0,0.3);
+        }
+
+        .question-section{
+            margin-top:30px;
+        }
+
+        input[type="text"]{
+            width:100%;
+            padding:18px;
+            background:#171717;
+            border:none;
+            outline:none;
+            border-radius:16px;
+            color:#fff;
+            font-size:15px;
+            border:1px solid rgba(255,255,255,0.08);
+            transition:0.3s;
+        }
+
+        input[type="text"]:focus{
+            border-color:#ffb300;
+            box-shadow:0 0 15px rgba(255,179,0,0.2);
+        }
+
+        .ask-btn{
+            width:100%;
+            margin-top:18px;
+            padding:16px;
+            border:none;
+            border-radius:16px;
+            background:#ffb300;
+            color:#111;
+            font-size:16px;
+            font-weight:600;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .ask-btn:hover{
+            background:#ffc107;
+            transform:translateY(-2px);
+            box-shadow:0 5px 20px rgba(255,179,0,0.4);
+        }
+
+        .result-box{
+            margin-top:30px;
+            background:#151515;
+            border-radius:20px;
+            padding:22px;
+            border:1px solid rgba(255,255,255,0.05);
+            min-height:120px;
+        }
+
+        .result-box h3{
+            color:#ffb300;
+            margin-bottom:12px;
+        }
+
+        .result-box p{
+            color:#d8d8d8;
+            line-height:1.7;
+        }
+
+        @media(max-width:600px){
+
+            .container{
+                padding:25px;
+            }
+
+            .title{
+                font-size:28px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1 class="title">
+        PDF AI Assistant
+    </h1>
+
+    <p class="subtitle">
+        Upload your PDF and ask questions instantly
+    </p>
+
+    <!-- Upload Section -->
+
+    <div class="upload-box">
+
+        <h3>Select PDF File</h3>
+
+        <label
+            for="pdfFile"
+            class="custom-file-upload"
+        >
+            Choose PDF
+        </label>
+
+        <input
+            type="file"
+            id="pdfFile"
+            accept=".pdf"
+            onchange="showFileName()"
+        >
+
+        <div id="fileName">
+            No file selected
+        </div>
+
+    </div>
+
+    <button
+        class="upload-btn"
+        onclick="uploadPDF()"
+    >
+        Upload PDF
+    </button>
+
+    <!-- Question Section -->
+
+    <div class="question-section">
+
+        <input
+            type="text"
+            id="question"
+            placeholder="Ask something from the PDF..."
+        >
+
+        <button
+            class="ask-btn"
+            onclick="askQuestion()"
+        >
+            Ask AI
+        </button>
+
+    </div>
+
+    <!-- Result -->
+
+    <div
+        class="result-box"
+        id="result"
+    >
+        <h3>AI Response</h3>
+
+        <p>
+            Your answer will appear here...
+        </p>
+    </div>
+
+</div>
+
+<script>
+
+function showFileName(){
+
+    const fileInput =
+        document.getElementById(
+            "pdfFile"
+        );
+
+    const fileName =
+        fileInput.files[0]
+        ?
+        fileInput.files[0].name
+        :
+        "No file selected";
+
+    document.getElementById(
+        "fileName"
+    ).innerText = fileName;
+}
+
+
+
+async function uploadPDF() {
+
+    const fileInput =
+        document.getElementById(
+            "pdfFile"
+        );
+
+    const file =
+        fileInput.files[0];
+
+    if(!file){
+
+        alert("Please select a PDF");
+
+        return;
+    }
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "file",
+        file
+    );
+
+    document.getElementById(
+        "result"
+    ).innerHTML = `
+        <h3>Uploading...</h3>
+        <p>Processing PDF document...</p>
+    `;
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/upload",
+        {
+            method:"POST",
+            body:formData
+        }
+    );
+
+    const data =
+        await response.json();
+
+    document.getElementById(
+        "result"
+    ).innerHTML = `
+        <h3>Upload Status</h3>
+        <p>${data.message}</p>
+    `;
+}
+
+
+
+async function askQuestion() {
+
+    const question =
+        document.getElementById(
+            "question"
+        ).value;
+
+    if(question.trim() === ""){
+
+        alert("Enter a question");
+
+        return;
+    }
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "question",
+        question
+    );
+
+    document.getElementById(
+        "result"
+    ).innerHTML = `
+        <h3>Thinking...</h3>
+        <p>Generating answer from PDF...</p>
+    `;
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/ask",
+        {
+            method:"POST",
+            body:formData
+        }
+    );
+
+    const data =
+        await response.json();
+
+    document.getElementById(
+        "result"
+    ).innerHTML = `
+        <h3>AI Response</h3>
+        <p>${data.answer}</p>
+    `;
+}
+
+</script>
+
+</body>
+</html>
